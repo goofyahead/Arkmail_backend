@@ -52,6 +52,7 @@ exports.retrieveConversations = function (req, res){
 				if (mailbox.messages.total == 0){
 					console.log('should skip'.red);
 					cb(null);
+					return;
 				} 
 				if (err) die(err);
 				imap.search([ 'ALL' ], function(err, results) {
