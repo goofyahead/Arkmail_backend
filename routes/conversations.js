@@ -63,8 +63,8 @@ exports.retrieveConversations = function (req, res){
 						fetch.on('message', function(msg) {
 
 							msg.on('headers', function(hdrs) {
-
-								if (! messagesList[util.normalizeMessageId(hdrs['message-id'].toString())]) {
+								if (hdrs['message-id']) {
+								if ( ! messagesList[util.normalizeMessageId(hdrs['message-id'].toString())]) {
 				                var related = null;
 				                var references = [];
 				                // add in reply to to the references.
@@ -142,6 +142,7 @@ exports.retrieveConversations = function (req, res){
 			                  if (! messagesList[uid]) messagesList[uid] = container;
 			                });
 			              }
+			          }
 
 							}); //headers
 
