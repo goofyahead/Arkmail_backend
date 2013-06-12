@@ -7,7 +7,12 @@ configs['aol.com'] =  {box: [], host : 'imap.aol.com', port : '993', secure : tr
 
 exports.getConfig = function (mail) {
 	console.log('retrieving config for ' + mail.toString().yellow);
-	return configs[ mail.match(regex)[1] ];
+	if (configs[ mail.match(regex)[1] ] != null) {
+		return configs[ mail.match(regex)[1] ];
+	} else {
+		return configs['gmail.com'];
+	}
+	
 }
 
 exports.getBoxes = function ( imap, mail, config, cb) {

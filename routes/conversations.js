@@ -159,7 +159,7 @@ exports.retrieveConversations = function (req, res){
 	    	console.log('Done fetching all messages!');
 	        imap.logout();
 	        console.log(conversations);
-	        res.send('OK');
+	        res.send(conversations);
 	    });
 
 	    });//imap connect
