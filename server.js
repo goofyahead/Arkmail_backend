@@ -10,6 +10,8 @@ var PORT = 3000;
 
 // GET PETITIONS
 app.get('/arkmail/conversations', conversations.retrieveConversations);
+//TEST
+app.get('/arkmail/testpush', pushNotifications.sendMessage);
 
 // POST PETITIONS
 app.post('/arkmail/register', pushNotifications.registerDevice);

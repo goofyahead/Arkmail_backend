@@ -12,6 +12,8 @@
       "colors": "*",
       "imap" : "*",
       "mailparser" : "*",
-      "async" : "*"
+      "async" : "*",
+      "apnagent" : "*",
+      "node-gcm" : "*"
   }
 }
