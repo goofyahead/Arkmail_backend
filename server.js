@@ -6,7 +6,11 @@ var colors = require('colors');
 var app = express();
 app.use(express.bodyParser());
 
-var PORT = 3000;
+var PORT = 80;
+
+app.get('/arkmail/hello', function(req, res){
+  res.send('hello world');
+});
 
 // GET PETITIONS
 app.get('/arkmail/conversations', conversations.retrieveConversations);
