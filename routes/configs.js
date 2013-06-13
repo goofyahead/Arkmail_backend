@@ -24,7 +24,7 @@ exports.getBoxes = function ( imap, mail, config, cb) {
 			imap.getBoxes(function (err, boxes){
 				// console.log(boxes);
 		    	for (var key in boxes) {
-		    		if (key != 'Bulk Mail' && key != 'Y! Conversations' && key != 'Trash') config.box.push(key);
+		    		if (key != 'Bulk Mail' && key != 'Y! Conversations' && key != 'Trash' && key != 'Sent') config.box.push(key);
 		    		// if (key == 'Draft') config.box.push(key);
 		    	}
 		    	console.log(config.box);

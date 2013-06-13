@@ -55,7 +55,9 @@ exports.retrieveConversations = function (req, res){
 					return;
 				} 
 				if (err) die(err);
-				imap.search([ 'ALL' ], function(err, results) {
+				imap.search([ 'ALL', ['SINCE', 'June 1, 2012'] ], function(err, results) {
+					// console.log('status ///////////////////////////'.green);
+					// console.log(messagesList);
 					if (err) die(err);
 					imap.fetch(results, { headers: true,
 						body: false,
@@ -92,14 +94,26 @@ exports.retrieveConversations = function (req, res){
 				                  // if doesnt have tittle set it.
 				                  if (related.title == '' && hdrs['subject']) related.title = util.normalizeSubject(hdrs['subject'].toString());
 
-				                  //iterate references and link them to this container
-				                  references.forEach(function (uid){
-				                    if (! _.contains(related.messages, uid)) related.messages.push(uid); // add refs to the container
+				                  //get related uids
+				                  var relatedUID = [];
+				                  related.messages.forEach(function (messageObj) {
+				                  		relatedUID.push(messageObj.messageId);
+				                  		//console.log('storing'.yellow + messageObj.messageId);
+				                  });
+
+								  //iterate references and link them to this container
+				                  references.forEach(function (uid) {
+				                  	//console.log(uid.toString().green);
+				                    if (! _.contains(relatedUID, uid)){
+				                    	related.messages.push({ path: box, messageId: uid}); // add refs to the container
+				                    	relatedUID.push(uid);
+				                    	//console.log('adding '.red + uid);
+				                    } 
 				                    if (! messagesList[uid]) messagesList[uid] = related;
 				                  });
 
 				                  //add this UID to the list and link to container
-				                  related.messages.push(util.normalizeMessageId(hdrs['message-id'].toString()));
+				                  related.messages.push({ path: box, messageId: util.normalizeMessageId(hdrs['message-id'].toString())});
 				                  messagesList[util.normalizeMessageId(hdrs['message-id'].toString())] = related;
 
 				                } else { //there is not container for this message or any related message
@@ -107,16 +121,29 @@ exports.retrieveConversations = function (req, res){
 			                  var container = {title : '', messages : []};
 
 			                  //add myself
-			                  container['messages'].push(util.normalizeMessageId(hdrs['message-id'].toString()).toString());
+			                  container['messages'].push({ path: box, messageId: util.normalizeMessageId(hdrs['message-id'].toString())});
 			                  //set subject
 			                  if (hdrs['subject']) container.title = util.normalizeSubject(hdrs['subject'].toString());
 			                  // link list with container
 			                  messagesList[util.normalizeMessageId(hdrs['message-id'].toString())] = container;
-			                  //add references
-			                  references.forEach(function (uid){ 
-			                    if (! _.contains(container.messages, uid)) container.messages.push(uid);
-			                  });
-			                
+
+
+			                   //get related uids
+				                  var relatedUID = [];
+				                  container.messages.forEach(function (messageObj){
+				                  		relatedUID.push(messageObj.messageId);
+				                  		//console.log('adding '.red + messageObj.messageId);
+				                  });
+
+								  //iterate references and link them to this container
+				                  references.forEach(function (uid){	
+				                    if (! _.contains(relatedUID, uid)) {
+				                    	container.messages.push({ path: box, messageId: uid}); // add refs to the container
+				                    	relatedUID.push(uid);
+				                    	//console.log('adding '.green + uid);
+				                    } 
+				                  });
+
 			                  conversations.push(container);
 			                	}
 			              	} else {
@@ -136,9 +163,18 @@ exports.retrieveConversations = function (req, res){
 			                }
 
 			                //search for existing containers
+			                //get related uids
+				                  var relatedUID = [];
+				                  container.messages.forEach(function (messageObj){
+				                  		relatedUID.push(messageObj.messageId);
+				                  });
+				                  
 			                //iterate references and link them to this container
 			                references.forEach(function (uid){
-			                  if (! _.contains(container.messages, uid)) container.messages.push(uid); // add refs to the container
+			                  if (! _.contains(relatedUID, uid)){
+			                  	container.messages.push({ path: box, messageId: uid}); // add refs to the container
+			                  	relatedUID.push(uid);
+			                  }
 			                  if (! messagesList[uid]) messagesList[uid] = container;
 			                });
 			              }
@@ -157,7 +193,7 @@ exports.retrieveConversations = function (req, res){
 			});
 			});
 	    }, function (err) {
-	    	console.log('Done fetching all messages!');
+	    	console.log('Done fetching all messages!'.green);
 	        imap.logout();
 	        console.log(conversations);
 	        res.send(conversations);
