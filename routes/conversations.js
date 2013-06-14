@@ -56,8 +56,9 @@ exports.retrieveConversations = function (req, res){
 				} 
 				if (err) die(err);
 				imap.search([ 'ALL', ['SINCE', 'June 1, 2012'] ], function(err, results) {
-					// console.log('status ///////////////////////////'.green);
-					// console.log(messagesList);
+					 // console.log('status ///////////////////////////'.green);
+					 // console.log(messagesList);
+
 					if (err) die(err);
 					imap.fetch(results, { headers: true,
 						body: false,
@@ -65,6 +66,7 @@ exports.retrieveConversations = function (req, res){
 						fetch.on('message', function(msg) {
 
 							msg.on('headers', function(hdrs) {
+								// console.log(hdrs);
 								if (hdrs['message-id']) {
 								if ( ! messagesList[util.normalizeMessageId(hdrs['message-id'].toString())]) {
 				                var related = null;
@@ -141,7 +143,8 @@ exports.retrieveConversations = function (req, res){
 				                    	container.messages.push({ path: box, messageId: uid}); // add refs to the container
 				                    	relatedUID.push(uid);
 				                    	//console.log('adding '.green + uid);
-				                    } 
+				                    }
+				                    if (! messagesList[uid]) messagesList[uid] = container;
 				                  });
 
 			                  conversations.push(container);
@@ -164,10 +167,10 @@ exports.retrieveConversations = function (req, res){
 
 			                //search for existing containers
 			                //get related uids
-				                  var relatedUID = [];
-				                  container.messages.forEach(function (messageObj){
-				                  		relatedUID.push(messageObj.messageId);
-				                  });
+			                  var relatedUID = [];
+			                  container.messages.forEach(function (messageObj){
+			                  		relatedUID.push(messageObj.messageId);
+			                  });
 				                  
 			                //iterate references and link them to this container
 			                references.forEach(function (uid){
@@ -178,13 +181,23 @@ exports.retrieveConversations = function (req, res){
 			                  if (! messagesList[uid]) messagesList[uid] = container;
 			                });
 			              }
-			          }
+			          	}
 
-							}); //headers
+						console.log('Flags: ' + msg.flags);
+			            if ( ! _.contains(msg.flags, '\\Seen')){
+			              	console.log('unread'.red);
+			              	messagesList[util.normalizeMessageId(hdrs['message-id'].toString())]['unread'] = true;
+			            } else {
+			            	if (! messagesList[util.normalizeMessageId(hdrs['message-id'].toString())]['unread'])
+			            	messagesList[util.normalizeMessageId(hdrs['message-id'].toString())]['unread'] = false;
+			            }
 
-				            msg.on('end', function() {
-				              console.log('Finished message no. ' + msg.seqno);
-				            });
+						}); //headers
+
+			            msg.on('end', function() {
+			              console.log('Finished message no. ' + msg.seqno);
+
+			            });
 
 		    			});
 	    		}}, function(err) {
