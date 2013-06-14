@@ -8,7 +8,7 @@ var message = new gcm.Message();
 
 // or with object values
 var message = new gcm.Message({
-    collapseKey: 'demo',
+    collapseKey: 'demoa',
     delayWhileIdle: true,
     timeToLive: 3,
     data: {
@@ -18,7 +18,12 @@ var message = new gcm.Message({
 });
 
 var sender = new gcm.Sender('AIzaSyDhXsg1aVauF1neYyulyCQa6A9A67zO6k0');
-var registrationIds = [];
+var registrationIds = ['APA91bGoEd9FZvKQGGMcEymJw3Aovf534Bj6Y5C3w0HR7bSYF57ggPxdCfZkDF3jmGqa5kQYXc_0Vp8NccMJfXoxqDA9YS14UXZDgWTs0ErIHf_7UQp7CyBSMhnzn_LjqcCUaXVW4oVK33PSP8xbABINI0Z8JL2NVw'];
+
+
+sender.send(message, registrationIds, 4, function (err, result) {
+     console.log(result);
+});
 
 exports.registerDevice = function(req, res) {
 	

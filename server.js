@@ -2,6 +2,7 @@ var conversations = require('./routes/conversations.js');
 var pushNotifications = require('./routes/pushNotifications.js');
 var express = require('express');
 var colors = require('colors');
+var checkMail = require('./routes/newmail');
 
 var app = express();
 app.use(express.bodyParser());
