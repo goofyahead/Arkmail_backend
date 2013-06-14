@@ -129,7 +129,6 @@ exports.retrieveConversations = function (req, res){
 			                  // link list with container
 			                  messagesList[util.normalizeMessageId(hdrs['message-id'].toString())] = container;
 
-
 			                   //get related uids
 				                  var relatedUID = [];
 				                  container.messages.forEach(function (messageObj){
@@ -138,7 +137,7 @@ exports.retrieveConversations = function (req, res){
 				                  });
 
 								  //iterate references and link them to this container
-				                  references.forEach(function (uid){	
+				                  references.forEach(function (uid){
 				                    if (! _.contains(relatedUID, uid)) {
 				                    	container.messages.push({ path: box, messageId: uid}); // add refs to the container
 				                    	relatedUID.push(uid);
@@ -192,11 +191,19 @@ exports.retrieveConversations = function (req, res){
 			            	messagesList[util.normalizeMessageId(hdrs['message-id'].toString())]['unread'] = false;
 			            }
 
+			            //find the container, find the message, add the UID.
+			            console.log('checking '.green + util.normalizeMessageId(hdrs['message-id'].toString()));
+			            messagesList[util.normalizeMessageId(hdrs['message-id'].toString())].messages.forEach( function (messageObj) {
+			            	if (messageObj.messageId == util.normalizeMessageId(hdrs['message-id'].toString())){
+			            		messageObj['messageUid'] = msg.uid;
+			            	}
+			            });
+			            
 						}); //headers
 
 			            msg.on('end', function() {
 			              console.log('Finished message no. ' + msg.seqno);
-
+			              console.log('uid ' + msg.uid);
 			            });
 
 		    			});
